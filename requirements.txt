@@ -22,7 +22,8 @@ plotly>=5.0.0
 streamlit>=1.28.0
 
 # HTML parsing and processing
-lxml>=4.6.0
+lxml[html_clean]>=4.6.0
+
 html5lib>=1.1
 
 # URL parsing and web utilities
