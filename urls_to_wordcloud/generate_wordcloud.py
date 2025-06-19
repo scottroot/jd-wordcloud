@@ -16,15 +16,7 @@ except LookupError:
     nltk.download('stopwords')
     nltk.download('punkt')
 
-def read_files(file_path):
-    """Read all text files from the specified path pattern."""
-    texts = []
-    for file in glob.glob(file_path):
-        with open(file, 'r', encoding='utf-8') as f:
-            texts.append(f.read())
-    return texts
-
-def preprocess(text, n_gram_size=1):
+def preprocess_text(text, n_gram_size=1):
     """Clean and tokenize text, optionally creating n-grams."""
     # Remove non-alphanumeric characters and convert to lowercase
     text = re.sub(r'\W+', ' ', text.lower())
@@ -46,12 +38,13 @@ def preprocess(text, n_gram_size=1):
     else:
         return filtered_words
 
-def calculate_word_frequencies(corpus, min_frequency=1, n_gram_size=1):
-    """Calculate word frequencies from corpus, filtering by minimum frequency."""
+
+def calculate_word_frequencies(texts, min_frequency=1, n_gram_size=1):
+    """Calculate word frequencies from texts, filtering by minimum frequency."""
     word_counts = Counter()
 
-    for doc in corpus:
-        words = preprocess(doc, n_gram_size)
+    for text in texts:
+        words = preprocess_text(text, n_gram_size)
         word_counts.update(words)
 
     # Filter words by minimum frequency
@@ -59,6 +52,16 @@ def calculate_word_frequencies(corpus, min_frequency=1, n_gram_size=1):
                       if count >= min_frequency}
 
     return filtered_counts
+
+
+def get_top_words(word_counts, top_n=10):
+    """Get the top N most frequent words from word_counts."""
+    if not word_counts:
+        return []
+
+    sorted_words = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
+    return sorted_words[:top_n]
+
 
 def generate_wordcloud(word_counts, max_words=50, min_frequency=2, n_gram_size=1):
     """Generate and display word cloud."""
