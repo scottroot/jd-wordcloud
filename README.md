@@ -4,7 +4,7 @@ A Streamlit web application that scrapes job descriptions from URLs and generate
 
 ## Features
 
-- 🔗 **URL Scraping**: Automatically scrape job descriptions from multiple URLs
+- 🔗 **URL Scraping**: Automatically scrape job descriptions from multiple URLs using requests-html
 - 📊 **Interactive Wordclouds**: Generate beautiful wordclouds with customizable parameters
 - 📈 **Data Visualization**: View top words with frequency charts
 - 📋 **Data Export**: Download results as CSV files
@@ -26,18 +26,35 @@ A Streamlit web application that scrapes job descriptions from URLs and generate
    pip install -r requirements.txt
    ```
 
-3. **Download NLTK data**
+3. **Download NLTK data (one-time setup)**
+   ```bash
+   python setup_nltk.py
+   ```
+   Or manually:
    ```bash
    python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
    ```
 
 4. **Run the app**
    ```bash
-   streamlit run app.py
+   streamlit run streamlit_app.py
    ```
 
 5. **Open your browser**
    Navigate to `http://localhost:8501`
+
+### Using Dev Container (Recommended)
+
+If you're using VS Code with Dev Containers:
+
+1. **Open in Dev Container**
+   - Open the project in VS Code
+   - When prompted, click "Reopen in Container"
+   - The container will automatically install dependencies and download NLTK data
+
+2. **The app will start automatically**
+   - Streamlit will be available at `http://localhost:8501`
+   - All dependencies and NLTK data are pre-configured
 
 ### Docker Deployment
 
@@ -64,91 +81,51 @@ A Streamlit web application that scrapes job descriptions from URLs and generate
 - **N-gram Size**: 1 (single words), 2 (word pairs), 3 (word triplets)
 - **Minimum Frequency**: Minimum times a word must appear to be included
 - **Maximum Words**: Maximum number of words to display in the wordcloud
-- **Output Directory**: Optional directory to save combined text files
-
-## Deployment Options
-
-### Streamlit Cloud
-
-1. Push your code to GitHub
-2. Connect your repository to [Streamlit Cloud](https://streamlit.io/cloud)
-3. Deploy with the following settings:
-   - **Main file path**: `app.py`
-   - **Python version**: 3.9
-
-### Heroku
-
-1. **Create a `Procfile`**
-   ```
-   web: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
-   ```
-
-2. **Deploy to Heroku**
-   ```bash
-   heroku create your-app-name
-   git push heroku main
-   ```
-
-### AWS/GCP/Azure
-
-Use the provided Dockerfile for container deployment:
-
-```bash
-# Build the image
-docker build -t wordcloud-app .
-
-# Run the container
-docker run -p 8501:8501 wordcloud-app
-```
 
 ## Project Structure
 
 ```
 jd-wordcloud/
-├── app.py                          # Main Streamlit application
-├── run_wordcloud.py               # Core wordcloud generation module
-├── requirements.txt               # Python dependencies
-├── Dockerfile                     # Docker configuration
-├── docker-compose.yml            # Docker Compose configuration
-├── .streamlit/
-│   └── config.toml               # Streamlit configuration
-├── urls_to_wordcloud/            # Package directory
+├── streamlit_app.py              # Main Streamlit application
+├── setup_nltk.py                 # NLTK data setup script
+├── requirements.txt              # Python dependencies
+├── .devcontainer/
+│   └── devcontainer.json        # Dev container configuration
+├── urls_to_wordcloud/           # Package directory
 │   ├── __init__.py
-│   ├── scrape_job_descriptions.py
+│   ├── scrape_url.py
 │   └── generate_wordcloud.py
-└── README.md                     # This file
+└── README.md                    # This file
 ```
 
 ## Dependencies
 
 ### Core Dependencies
 - **Streamlit**: Web application framework
-- **Selenium**: Web scraping and browser automation
+- **requests-html**: Web scraping with JavaScript rendering
 - **BeautifulSoup4**: HTML parsing
 - **WordCloud**: Wordcloud generation
 - **NLTK**: Natural language processing
 - **Plotly**: Interactive data visualization
 - **Pandas**: Data manipulation
-
-### System Dependencies
-- **Chrome/ChromeDriver**: Required for web scraping (included in Docker)
+- **nest-asyncio**: Async support for Streamlit
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Chrome/ChromeDriver not found**
-   - Use the provided Dockerfile which includes Chrome
-   - Or install Chrome and ChromeDriver manually
+1. **NLTK data missing**
+   - Run: `python setup_nltk.py`
+   - Or manually: `python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"`
 
-2. **NLTK data missing**
-   - Run: `python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"`
+2. **ModuleNotFoundError: No module named 'requests_html'**
+   - Install missing dependencies: `pip install -r requirements.txt`
 
-3. **Port already in use**
-   - Change the port in `.streamlit/config.toml` or use `--server.port=8502`
+3. **App hangs on startup**
+   - This usually means NLTK data is being downloaded. Wait for it to complete (only happens once)
 
-4. **Memory issues with large datasets**
-   - Reduce the number of URLs or increase Docker memory limits
+4. **Port already in use**
+   - Change the port: `streamlit run streamlit_app.py --server.port=8502`
 
 ### Performance Tips
 

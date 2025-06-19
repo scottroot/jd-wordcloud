@@ -20,12 +20,24 @@ import nest_asyncio
 # Apply nest_asyncio to handle event loop issues in Streamlit
 nest_asyncio.apply()
 
-# Download NLTK data
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-    nltk.download('punkt')
+# Download NLTK data efficiently
+@st.cache_resource
+def download_nltk_data():
+    """Download NLTK data once and cache the result."""
+    try:
+        # Check if data already exists
+        nltk.data.find('corpora/stopwords')
+        nltk.data.find('tokenizers/punkt')
+        return True
+    except LookupError:
+        # Download missing data
+        with st.spinner("📥 Downloading NLTK data (this only happens once)..."):
+            nltk.download('stopwords', quiet=True)
+            nltk.download('punkt', quiet=True)
+        return True
+
+# Download NLTK data on app startup
+download_nltk_data()
 
 # Page configuration
 st.set_page_config(
